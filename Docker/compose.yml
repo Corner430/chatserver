@@ -1,0 +1,10 @@
+services:
+  ubuntu:
+    tty: true # docker run -t
+    build:
+      context: $PWD/dockerfile
+      dockerfile: Dockerfile
+    port:
+      - "20022:22"
+    volumes:
+      - $PWD/../project:/root/chatserver
