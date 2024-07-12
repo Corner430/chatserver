@@ -41,10 +41,10 @@ RUN echo "$(cat /root/bashrc)" >> /root/.bashrc
 RUN rm -f /root/bashrc
 
 # 创建 /root/project 文件夹
-RUN mkdir /root/project
+RUN mkdir /root/chatserver
 
 # 下载 json.hpp 到 /usr/include
-RUN wget https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp -O /usr/include/json.hpp
+# RUN wget https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp -O /usr/include/json.hpp
 
 # 下载 muduo 到 /root 目录
 RUN git clone https://github.com/chenshuo/muduo.git /root/muduo

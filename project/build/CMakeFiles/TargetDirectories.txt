@@ -1,0 +1,2 @@
+/root/myproject/chatserver/project/build/CMakeFiles/edit_cache.dir
+/root/myproject/chatserver/project/build/CMakeFiles/rebuild_cache.dir
