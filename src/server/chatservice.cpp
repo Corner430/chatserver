@@ -81,10 +81,10 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js,
         _userConnMap.insert({id, conn});
       }
 
-      // id用户登录成功后，向redis订阅channel(id)
+      // id 用户登录成功后，向redis订阅channel(id)
       _redis.subscribe(id);
 
-      // 登录成功，更新用户状态信息 state offline=>online
+      // 登录成功，更新用户状态信息 state offline => online
       user.setState("online");
       _userModel.updateState(user);
 
@@ -144,7 +144,7 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js,
       conn->send(response.dump());
     }
   } else {
-    // 该用户不存在，用户存在但是密码错误，登录失败
+    // 该用户不存在 或者 用户存在但是密码错误，登录失败
     json response;
     response["msgid"] = LOGIN_MSG_ACK;
     response["errno"] = 1;

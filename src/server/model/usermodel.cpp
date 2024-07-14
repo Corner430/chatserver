@@ -57,11 +57,8 @@ bool UserModel::updateState(User user) {
           user.getState().c_str(), user.getId());
 
   MySQL mysql;
-  if (mysql.connect()) {
-    if (mysql.update(sql)) {
-      return true;
-    }
-  }
+  if (mysql.connect() && mysql.update(sql))
+    return true;
   return false;
 }
 
