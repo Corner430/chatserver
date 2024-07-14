@@ -265,10 +265,9 @@ void ChatService::createGroup(const TcpConnectionPtr &conn, json &js,
 
   // 存储新创建的群组信息
   Group group(-1, name, desc);
-  if (_groupModel.createGroup(group)) {
+  if (_groupModel.createGroup(group)) // 这会将 group 的 id 设置为新插入的 id
     // 存储群组创建人信息
     _groupModel.addGroup(userid, group.getId(), "creator");
-  }
 }
 
 // 加入群组业务
