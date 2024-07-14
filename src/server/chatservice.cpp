@@ -43,13 +43,13 @@ ChatService::ChatService() {
 
 // 服务器异常，业务重置方法
 void ChatService::reset() {
-  // 把online状态的用户，设置成offline
+  // 把 online 状态的用户，设置成 offline
   _userModel.resetState();
 }
 
 // 获取消息对应的处理器
 MsgHandler ChatService::getHandler(int msgid) {
-  // 记录错误日志，msgid没有对应的事件处理回调
+  // 记录错误日志，msgid 没有对应的事件处理回调
   auto it = _msgHandlerMap.find(msgid);
   if (it == _msgHandlerMap.end()) // 返回一个默认的处理器，空操作
     return [=](const TcpConnectionPtr &conn, json &js, Timestamp) {
