@@ -75,8 +75,7 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js,
       response["errmsg"] = "this account is using, input another!";
       conn->send(response.dump());
     } else {
-      // 登录成功，记录用户连接信息
-      {
+      { // 登录成功，记录用户连接信息
         lock_guard<mutex> lock(_connMutex);
         _userConnMap.insert({id, conn});
       }
@@ -182,7 +181,6 @@ void ChatService::reg(const TcpConnectionPtr &conn, json &js, Timestamp time) {
 void ChatService::loginout(const TcpConnectionPtr &conn, json &js,
                            Timestamp time) {
   int userid = js["id"].get<int>();
-
   {
     lock_guard<mutex> lock(_connMutex);
     auto it = _userConnMap.find(userid);
@@ -204,14 +202,12 @@ void ChatService::clientCloseException(const TcpConnectionPtr &conn) {
   User user;
   {
     lock_guard<mutex> lock(_connMutex);
-    for (auto it = _userConnMap.begin(); it != _userConnMap.end(); ++it) {
+    for (auto it = _userConnMap.begin(); it != _userConnMap.end(); ++it)
       if (it->second == conn) {
-        // 从map表删除用户的链接信息
-        user.setId(it->first);
-        _userConnMap.erase(it);
+        user.setId(it->first); // 用与查询用户信息，接下来更新用户状态
+        _userConnMap.erase(it); // 从 map 表删除用户的链接信息
         break;
       }
-    }
   }
 
   // 用户注销，相当于就是下线，在redis中取消订阅通道
