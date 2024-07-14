@@ -246,7 +246,7 @@ void ChatService::oneChat(const TcpConnectionPtr &conn, json &js,
   _offlineMsgModel.insert(toid, js.dump());
 }
 
-// 添加好友业务 msgid id friendid
+// 添加好友业务
 void ChatService::addFriend(const TcpConnectionPtr &conn, json &js,
                             Timestamp time) {
   int userid = js["id"].get<int>();
