@@ -59,7 +59,7 @@ MsgHandler ChatService::getHandler(int msgid) {
     return _msgHandlerMap[msgid];
 }
 
-// 处理登录业务  id  pwd   pwd
+// 处理登录业务
 void ChatService::login(const TcpConnectionPtr &conn, json &js,
                         Timestamp time) {
   int id = js["id"].get<int>();

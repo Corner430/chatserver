@@ -41,7 +41,7 @@ void ChatServer::onMessage(const TcpConnectionPtr &conn, Buffer *buffer,
   string buf = buffer->retrieveAllAsString();
 
   // 测试，添加json打印代码
-  cout << buf << endl;
+  // cout << buf << endl;
 
   // 数据的反序列化
   json js = json::parse(buf);
