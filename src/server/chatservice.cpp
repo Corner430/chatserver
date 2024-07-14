@@ -224,25 +224,25 @@ void ChatService::clientCloseException(const TcpConnectionPtr &conn) {
 void ChatService::oneChat(const TcpConnectionPtr &conn, json &js,
                           Timestamp time) {
   int toid = js["toid"].get<int>();
-
   {
     lock_guard<mutex> lock(_connMutex);
     auto it = _userConnMap.find(toid);
     if (it != _userConnMap.end()) {
-      // toid在线，转发消息   服务器主动推送消息给toid用户
+      // toid 在线，转发消息
+      // 服务器主动推送消息给 toid 用户
       it->second->send(js.dump());
       return;
     }
   }
 
-  // 查询toid是否在线
+  // 查询 toid 是否在线
   User user = _userModel.query(toid);
   if (user.getState() == "online") {
     _redis.publish(toid, js.dump());
     return;
   }
 
-  // toid不在线，存储离线消息
+  // toid 不在线，存储离线消息
   _offlineMsgModel.insert(toid, js.dump());
 }
 
