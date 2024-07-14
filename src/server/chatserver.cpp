@@ -50,6 +50,7 @@ void ChatServer::onMessage(const TcpConnectionPtr &conn, Buffer *buffer,
   // 通过 js["msgid"] 的 get<int>() 方法获取消息类型
   // 根据消息类型，返回对应的业务处理器（就是一个回调（函数对象））
   auto msgHandler = ChatService::instance()->getHandler(js["msgid"].get<int>());
+
   // 通过事先绑定好的回调函数，来执行相应的业务处理
   msgHandler(conn, js, time);
 }
