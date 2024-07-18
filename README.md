@@ -32,39 +32,39 @@
 
 **User 表**
 
-| 字段名 | 类型 | 说明 | 约束 ｜
-｜ --- | --- | --- | --- |
-｜ id | INT | 用户 id | PRIMARY KEY, AUTO_INCREMENT |
-| name | VARCHAR(50) | 用户名 | NOT NULL, UNIQUE |
+| 字段名 | 类型 | 说明 | 约束 |
+| --- | --- | --- | --- |
+| id | INT | 用户 id | PRIMARY KEY , AUTO_INCREMENT |
+| name | VARCHAR(50) | 用户名 | NOT NULL , UNIQUE |
 | password | VARCHAR(50) | 密码 | NOT NULL |
 | state | ENUM('online', 'offline') | 用户登录状态 | DEFAULT 'offline' |
 
 **Friend 表**
 
-| 字段名 | 类型 | 说明 | 约束 ｜
-｜ --- | --- | --- | --- |
-｜ userid | INT | 用户 id | NOT NULL , 联合主键 |
-| friendid | INT | 好友 id | NOT NULL, 联合主键 |
+| 字段名 | 类型 | 说明 | 约束 |
+| --- | --- | --- | --- |
+| userid | INT | 用户 id | NOT NULL , 联合主键 |
+| friendid | INT | 好友 id | NOT NULL , 联合主键 |
 
 **AllGroup 表**
 
-| 字段名 | 类型 | 说明 | 约束 ｜
-｜ --- | --- | --- | --- |
-| id | INT | 群组 id | PRIMARY KEY, AUTO_INCREMENT |
-| groupname | VARCHAR(50) | 群组名 | NOT NULL, UNIQUE |
+| 字段名 | 类型 | 说明 | 约束 |
+| --- | --- | --- | --- |
+| id | INT | 群组 id | PRIMARY KEY , AUTO_INCREMENT |
+| groupname | VARCHAR(50) | 群组名 | NOT NULL , UNIQUE |
 | groupdesc | VARCHAR(200) | 群组描述 | DEFAULT '' |
 
 **GroupUser 表**
 
-| 字段名 | 类型 | 说明 | 约束 ｜
-｜ --- | --- | --- | --- |
+| 字段名 | 类型 | 说明 | 约束 |
+| --- | --- | --- | --- |
 | groupid | INT | 群组 id | NOT NULL , 联合主键 |
 | userid | INT | 组员 id | NOT NULL, 联合主键 |
 | grouprole | ENUM('creator', 'normal') | 组员角色 | DEFAULT 'normal' |
 
 **OfflineMessage 表**
 
-| 字段名 | 类型 | 说明 | 约束 ｜
-｜ --- | --- | --- | --- |
+| 字段名 | 类型 | 说明 | 约束 |
+| --- | --- | --- | --- |
 | userid | INT | 用户 id | NOT NULL |
 | message | VARCHAR(500) | 离线消息（存储 Json 字符串） | NOT NULL |
