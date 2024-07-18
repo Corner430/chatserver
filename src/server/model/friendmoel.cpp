@@ -1,4 +1,3 @@
-#include "db.h"
 #include "friendmodel.hpp"
 
 // 添加好友关系
@@ -7,9 +6,8 @@ void FriendModel::insert(int userid, int friendid) {
   char sql[1024] = {0};
   sprintf(sql, "insert into friend values(%d, %d)", userid, friendid);
 
-  MySQL mysql;
-  if (mysql.connect())
-    mysql.update(sql);
+  shared_ptr<Connection> sp = _connPool->getConnection();
+  if(sp) sp->update(sql);
 }
 
 // 返回用户好友列表
@@ -23,9 +21,9 @@ vector<User> FriendModel::query(int userid) {
           userid);
 
   vector<User> vec;
-  MySQL mysql;
-  if (mysql.connect()) {
-    MYSQL_RES *res = mysql.query(sql);
+  shared_ptr<Connection> sp = _connPool->getConnection();
+  if (sp) {
+    MYSQL_RES *res = sp->query(sql);
     if (res != nullptr) {
       // 把 userid 用户的所有好友信息放入 vec 中返回
       MYSQL_ROW row;

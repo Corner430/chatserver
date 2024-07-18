@@ -2,12 +2,13 @@
 #define GROUPMODEL_H
 
 #include "group.hpp"
+#include "model.hpp"
 #include <string>
 #include <vector>
 using namespace std;
 
 // 维护群组信息的操作接口方法
-class GroupModel {
+class GroupModel : public model {
 public:
   // 创建群组
   bool createGroup(Group &group);

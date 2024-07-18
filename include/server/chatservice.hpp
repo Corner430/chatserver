@@ -9,11 +9,11 @@ using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
+#include "CommonConnectionPool.h"
 #include "friendmodel.hpp"
 #include "groupmodel.hpp"
 #include "json.hpp"
 #include "offlinemessagemodel.hpp"
-#include "redis.hpp"
 #include "usermodel.hpp"
 using json = nlohmann::json;
 
@@ -26,6 +26,9 @@ class ChatService {
 public:
   // 获取单例对象的接口函数
   static ChatService *instance();
+
+  // 单例对象的连接池
+  ConnectionPool *_connPool;
 
   // 处理登录业务
   void login(const TcpConnectionPtr &conn, json &js, Timestamp time);
@@ -51,9 +54,6 @@ public:
   // 获取消息对应的处理器
   MsgHandler getHandler(int msgid);
 
-  // 从redis消息队列中获取订阅的消息
-  void handleRedisSubscribeMessage(int, string);
-
 private:
   ChatService();
 
@@ -71,9 +71,6 @@ private:
   OfflineMsgModel _offlineMsgModel;
   FriendModel _friendModel;
   GroupModel _groupModel;
-
-  // redis操作对象
-  Redis _redis;
 };
 
 #endif

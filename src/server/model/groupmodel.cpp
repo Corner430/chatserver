@@ -1,5 +1,4 @@
 #include "groupmodel.hpp"
-#include "db.h"
 
 // 创建群组
 bool GroupModel::createGroup(Group &group) {
@@ -8,11 +7,11 @@ bool GroupModel::createGroup(Group &group) {
   sprintf(sql, "insert into allgroup(groupname, groupdesc) values('%s', '%s')",
           group.getName().c_str(), group.getDesc().c_str());
 
-  MySQL mysql;
-  if (mysql.connect())
-    if (mysql.update(sql)) {
+  shared_ptr<Connection> sp = _connPool->getConnection();
+  if (sp)
+    if (sp->update(sql)) {
       // 将 group 的 id 设置为当前插入的数据的 id（自增的主键）
-      group.setId(mysql_insert_id(mysql.getConnection()));
+      group.setId(mysql_insert_id((*sp).getConnection()));
       return true;
     }
 
@@ -26,9 +25,9 @@ void GroupModel::addGroup(int userid, int groupid, string role) {
   sprintf(sql, "insert into groupuser values(%d, %d, '%s')", groupid, userid,
           role.c_str());
 
-  MySQL mysql;
-  if (mysql.connect())
-    mysql.update(sql);
+  shared_ptr<Connection> sp = _connPool->getConnection();
+  if (sp)
+    sp->update(sql);
 }
 
 // 查询用户所在群组信息
@@ -46,9 +45,9 @@ vector<Group> GroupModel::queryGroups(int userid) {
 
   vector<Group> groupVec;
 
-  MySQL mysql;
-  if (mysql.connect()) {
-    MYSQL_RES *res = mysql.query(sql);
+  shared_ptr<Connection> sp = _connPool->getConnection();
+  if (sp) {
+    MYSQL_RES *res = sp->query(sql);
     if (res != nullptr) {
       MYSQL_ROW row;
       // 查出 userid 所有的群组信息
@@ -69,7 +68,7 @@ vector<Group> GroupModel::queryGroups(int userid) {
             inner join groupuser b on b.userid = a.id where b.groupid=%d",
             group.getId());
 
-    MYSQL_RES *res = mysql.query(sql);
+    MYSQL_RES *res = sp->query(sql);
     if (res != nullptr) {
       MYSQL_ROW row;
       while ((row = mysql_fetch_row(res)) != nullptr) {
@@ -95,9 +94,9 @@ vector<int> GroupModel::queryGroupUsers(int userid, int groupid) {
           groupid, userid);
 
   vector<int> idVec;
-  MySQL mysql;
-  if (mysql.connect()) {
-    MYSQL_RES *res = mysql.query(sql);
+  shared_ptr<Connection> sp = _connPool->getConnection();
+  if (sp) {
+    MYSQL_RES *res = sp->query(sql);
     if (res != nullptr) {
       MYSQL_ROW row;
       while ((row = mysql_fetch_row(res)) != nullptr)
