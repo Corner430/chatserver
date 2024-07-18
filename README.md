@@ -10,7 +10,7 @@ mkdir build && cmake .. && make
 
 ## 1 开发环境
 
-[Docker 开发环境：Ubuntu 22.04](https://github.com/Corner430/Docker/tree/main/chatserver)
+[单机版 Docker 开发环境：Ubuntu 22.04](https://github.com/Corner430/Docker/tree/main/chatserver)
 
 用到的技术栈：
 
