@@ -1,5 +1,13 @@
 # 集群聊天服务器单机版
 
+使用方式
+
+```shell
+mkdir build && cmake .. && make
+```
+
+之后运行可执行文件即可
+
 ## 1 开发环境
 
 [Docker 开发环境：Ubuntu 22.04](https://github.com/Corner430/Docker/tree/main/chatserver)

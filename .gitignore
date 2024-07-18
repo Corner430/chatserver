@@ -1,7 +1,6 @@
 # Ignore built files
 /build/
 /bin/
-/lib/
 
 # Ignore CMake generated files
 CMakeFiles/
@@ -29,7 +28,7 @@ CMakeLists.txt.user
 Thumbs.db
 
 # Ignore config files that may contain sensitive information
-config/mysql.conf
+# config/mysql.conf
 
 # Ignore IDE-specific files
 .vscode/
