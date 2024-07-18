@@ -1,10 +1,14 @@
 # 集群聊天服务器单机版
 
-## 1 技术栈
+## 1 开发环境
 
-- Json 序列化和反序列化
-- muduo 网络库开发
-- MySQL 连接池的使用
+[Docker 开发环境：Ubuntu 22.04](https://github.com/Corner430/Docker/tree/main/chatserver)
+
+用到的技术栈：
+
+- Json 序列化和反序列化，借助于 [json for Modern C++](https://github.com/nlohmann/json)
+- muduo 网络库开发，借助于 [muduo](https://github.com/chenshuo/muduo)
+- MySQL 连接池的使用，借助于 [MySQL-Connection-Pool](https://github.com/Corner430/MySQL-Connection-Pool)
 
 ## 2 项目需求
 
@@ -21,14 +25,9 @@
 1. 掌握服务器的网络 I/O 模块，业务模块，数据模块分层的设计思想
 2. 掌握 C++ muduo 网络库的编程以及实现原理
 3. 掌握 Json 的编程应用
+4. 掌握 MySQL 连接池的使用
 
-## 4 开发环境
-
-1. 操作系统：Ubuntu 22.04
-2. [json for Modern C++](https://github.com/nlohmann/json)
-3. [muduo](https://github.com/chenshuo/muduo)
-
-## 5 数据库设计
+## 4 数据库设计
 
 **User 表**
 
