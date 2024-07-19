@@ -43,9 +43,92 @@ mkdir build && cmake .. && make # 之后运行可执行文件即可
 7. 掌握 nginx 配置部署 tcp 负载均衡器的应用以及原理
 8. 掌握服务器中间件的应用场景和基于发布-订阅的 redis 编程实践以及应用原理
 
-## 4 服务器中间件-基于发布-订阅的 Redis
+## 4 JSON 序列化和反序列化
 
-### 4.1 集群服务器之间的通信设计
+参考官方仓库或者 [testjson.cpp 示例文件](https://github.com/Corner430/chatserver/blob/main/test/testjson/testjson.cpp)
+
+## 5 muduo 网络库
+
+muduo 的网络设计：*reactors in threads --- one loop per thread*
+
+特点是 *one loop per thread*，有一个 *main reactor* 负责 *accept* 连接，然后将连接分发给某一个 *sub reactor* 处理（采用 *round-robin* 的方式来选择 *sub reactor*），该连接的所有操作都在那个 *sub reactor* 所处的线程中完成。多个连接可能被分派到多个线程中，以充分利用 CPU 的多核性能。
+
+*Reactor poll* 的大小是固定的，根据 CPU 的数目确定。
+```cpp
+// 设置 EventLoop 的线程个数，底层通过 EventLoopThreadPool 线程池管理线程类 EventLoopThread
+_server.setThreadNum(10);
+```
+
+> 如果有过多的耗费 CPU I/O 的计算任务，可以提交到创建的 ThreadPool 线程池中专门处理耗时的计算任务。
+
+更多详细内容参考 [muduo 官方文档](https://github.com/chenshuo/muduo) 或者 [mymuduo](https://github.com/Corner430/mymuduo)
+
+**使用方式**参考[muduo_server.cpp 示例文件](https://github.com/Corner430/chatserver/blob/main/test/testmuduo/muduo_server.cpp)
+
+## 6 项目结构
+
+```shell
+.
+├── bin # 可执行文件
+│   ├── ChatClient
+│   └── ChatServer
+├── build   # 编译文件
+├── CMakeLists.txt  # CMake 配置文件
+├── include # 头文件
+│   ├── public.hpp  # 公共头文件
+│   └── server      # 服务器头文件
+│       ├── chatserver.hpp  # 服务器类
+│       ├── chatservice.hpp # 服务器业务类
+│       ├── dbORM           # 数据库 ORM
+│       │   ├── group.hpp       # 群组
+│       │   ├── groupuser.hpp   # 群组用户
+│       │   └── user.hpp        # 用户
+│       ├── model           # 数据库操作
+│       │   ├── friendmodel.hpp
+│       │   ├── groupmodel.hpp
+│       │   ├── model.hpp
+│       │   ├── offlinemessagemodel.hpp
+│       │   └── usermodel.hpp
+│       ├── MySQLConnectionPool # MySQL 连接池
+│       │   ├── CommonConnectionPool.h
+│       │   ├── Connection.h
+│       │   └── public.h
+│       └── redis
+│           └── redis.hpp
+├── lib
+│   └── libmysql_connection_pool.so # MySQL 连接池动态库
+├── README.md   # 项目说明
+├── src # 源文件
+│   ├── client
+│   │   ├── CMakeLists.txt
+│   │   └── main.cpp
+│   ├── CMakeLists.txt
+│   └── server
+│       ├── chatserver.cpp
+│       ├── chatservice.cpp
+│       ├── CMakeLists.txt
+│       ├── main.cpp
+│       ├── model
+│       │   ├── friendmoel.cpp
+│       │   ├── groupmodel.cpp
+│       │   ├── offlinemessagemodel.cpp
+│       │   └── usermodel.cpp
+│       └── redis
+│           └── redis.cpp
+├── test        # 测试文件
+│   ├── testjson        # Json 序列化和反序列化测试
+│   │   ├── json.hpp
+│   │   └── testjson.cpp
+│   └── testmuduo       # muduo 网络库测试
+│       ├── CMakeLists.txt
+│       └── muduo_server.cpp
+└── thirdparty
+    └── json.hpp    # Json 序列化和反序列化头文件
+```
+
+## 7 服务器中间件-基于发布-订阅的 Redis
+
+### 7.1 集群服务器之间的通信设计
 
 当 ChatServer 集群部署多台服务器以后，登录在不同服务器上的用户如何进行通信？
 
@@ -57,7 +140,7 @@ mkdir build && cmake .. && make # 之后运行可执行文件即可
 
 ![20240719114641](https://cdn.jsdelivr.net/gh/Corner430/Picture/images/20240719114641.png)
 
-### 4.2 Redis 发布-订阅相关命令
+### 7.2 Redis 发布-订阅相关命令
 
 redis 的发布-订阅机制：发布-订阅模式包含了两种角色，分别是消息的发布者和消息的订阅者。订阅者可以订阅一个或者多个 channel，发布者可以向指定的 channel 发送消息，所有订阅了该 channel 的订阅者都会收到消息。
 
@@ -96,7 +179,7 @@ root@14178aa96595:~# redis-cli
 2. `message`：收到消息。第二个值是产生消息的 channel 名称，第三个值是消息体。
 3. `unsubscribe`：取消订阅。第二个值是取消订阅的 channel 名称，第三个值是当前客户端订阅的 channel 数量，如果数量为 0，则客户端会退出订阅状态。
 
-### 4.3 Redis 发布-订阅的客户端编程
+### 7.3 Redis 发布-订阅的客户端编程
 
 redis 支持不同的客户端编程语言，如 C、C++、Python、Java 等。这里使用 C++ 编程语言，使用 [hiredis](https://github.com/redis/hiredis) 库进行编程。
 
@@ -110,7 +193,7 @@ make install  # 安装，将头文件拷贝到 /usr/local/include，将库文件
 ldconfig /usr/local/lib   # 更新动态链接库
 ```
 
-## 5 数据库设计
+## 8 数据库设计
 
 **User 表**
 
