@@ -1,22 +1,24 @@
-# 聊天服务器单机版
+# 聊天服务器集群版
 
 使用方式
 
 ```shell
-mkdir build && cmake .. && make
+mkdir build && cmake .. && make # 之后运行可执行文件即可
 ```
-
-之后运行可执行文件即可
 
 ## 1 开发环境
 
-[单机版 Docker 开发环境：Ubuntu 22.04](https://github.com/Corner430/Docker/tree/main/chatserver)
+[集群版 Docker 开发环境：Ubuntu 22.04](https://github.com/Corner430/Docker/tree/main/chatserver-cluster)
 
 用到的技术栈：
 
 - Json 序列化和反序列化，借助于 [json for Modern C++](https://github.com/nlohmann/json)
 - muduo 网络库开发，借助于 [muduo](https://github.com/chenshuo/muduo)
+- [nginx 源码](https://github.com/nginx/nginx)编译安装和环境部署
+- nginx 的 tcp 负载均衡器配置
+- 基于发布-订阅的服务器中间件 redis 消息队列编程实践，借助于 [hiredis](https://github.com/redis/hiredis)
 - MySQL 连接池的使用，借助于 [MySQL-Connection-Pool](https://github.com/Corner430/MySQL-Connection-Pool)
+
 
 ## 2 项目需求
 
@@ -27,6 +29,8 @@ mkdir build && cmake .. && make
 5. 好友聊天
 6. 群组聊天
 7. 离线消息
+8. nginx 配置 tcp 负载均衡
+9. 集群聊天系统支持客户端跨服务器通信
 
 ## 3 项目目标
 
@@ -34,6 +38,10 @@ mkdir build && cmake .. && make
 2. 掌握 C++ muduo 网络库的编程以及实现原理
 3. 掌握 Json 的编程应用
 4. 掌握 MySQL 连接池的使用
+5. 掌握 Docker 一键部署
+6. 掌握 CMake
+7. 掌握 nginx 配置部署 tcp 负载均衡器的应用以及原理
+8. 掌握服务器中间件的应用场景和基于发布-订阅的 redis 编程实践以及应用原理
 
 ## 4 数据库设计
 
