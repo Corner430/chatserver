@@ -12,7 +12,6 @@ CMakeLists.txt.user
 # Ignore compiled binaries and executables
 *.o
 *.a
-*.so
 *.dll
 *.exe
 
