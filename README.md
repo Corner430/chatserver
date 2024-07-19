@@ -297,7 +297,9 @@ stream {
 
 > 之后 `./sbin/nginx -s reload` 重新加载配置文件，然后 `netstat -tanp` 查看端口监听情况。
 
-**如果出现很快断开的情况**，请打开 `keepalive`，并确保操作系统级别的 `keepalive` 设置打开。确保操作系统级别的 `keepalive` 设置也支持长时间保持连接。可以在系统配置文件中检查并配置这些参数，例如 `/etc/sysctl.conf`：
+**如果出现很快断开的情况**，可以分别尝试以下两种方法：
+1. 加大超时时间
+2. 请打开 `keepalive`，并确保操作系统级别的 `keepalive` 设置打开。确保操作系统级别的 `keepalive` 设置也支持长时间保持连接。可以在系统配置文件中检查并配置这些参数，例如 `/etc/sysctl.conf`：
 ```bash
 # 在/etc/sysctl.conf中添加以下设置，或使用sysctl命令临时设置
 
