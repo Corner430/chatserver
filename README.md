@@ -193,7 +193,108 @@ make install  # 安装，将头文件拷贝到 /usr/local/include，将库文件
 ldconfig /usr/local/lib   # 更新动态链接库
 ```
 
-## 8 数据库设计
+## 8 负载均衡
+
+### 8.1 什么是负载均衡
+
+单台服务器受限于硬件资源，其性能是有上限的，当单台服务器不能满足应用场景的并发需求量时，就需要考虑部署多个服务器共同处理客户端的并发请求，但是客户端怎么知道去连接具体哪台服务器呢?
+
+此时就需要一台负载均衡器，通过预设的负载算法，指导客户端连接服务器。
+
+负载均衡器有基于客户端的负载均衡和服务器的负载均衡
+
+### 8.2 nginx 编译安装
+
+在服务器快速集群环境搭建中，都迫切需要一个能拿来即用的负载均衡器，nginx 在 1.9 版本之前，只支持 http 协议 web 服务器的负载均衡，从 1.9 版本开始以后，nginx 开始支持 tcp 的长连接负载均衡，**但是 nginx 默认并没有编译 tcp 负载均衡模块，编译时，需要加入 `--with-stream` 参数来激活这个模块**
+
+> nginx 编译时加入 `--with-stream` 参数激活 tcp 负载均衡模块
+
+nginx 编译安装需要先安装 pcre、openssl、zlib 等库，也可以直接编译执行下面的 configure 命令，根据错误提示信息，安装相应缺少的库。
+
+```shell
+git clone https://github.com/nginx/nginx.git    # 下载 nginx 源码
+apt update && apt install -y libpcre3 libpcre3-dev  # 安装 pcre 库
+cd nginx    # 进入 nginx 目录
+./auto/configure --with-stream  # 编译 nginx，激活 tcp 负载均衡模块
+make && make install    # 编译安装
+```
+
+此时 nginx 默认安装在 `/usr/local/nginx` 目录下，有如下 4 个目录 `conf  html  logs  sbin`。可执行文件在 `sbin` 目录下，配置文件在 `conf` 目录下。
+
+**nginx 常用命令**：
+
+- `./sbin/nginx` 启动 nginx 服务
+- `./sbin/nginx -s stop` 停止 nginx 服务
+- `./sbin/nginx -s reload` 重新加载配置文件
+
+```shell
+root@14178aa96595:/usr/local/nginx# netstat -tanp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.1:33060         0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:40309         0.0.0.0:*               LISTEN      36793/code-f1e16e1e 
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.11:40853        0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      61913/nginx: master 
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      24/sshd: /usr/sbin/ 
+tcp        0      0 127.0.0.1:6379          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:40309         127.0.0.1:34242         ESTABLISHED 36793/code-f1e16e1e 
+tcp        0      0 172.19.0.2:37324        185.125.190.82:80       TIME_WAIT   -                   
+tcp        0      0 172.19.0.2:56746        140.82.112.22:443       ESTABLISHED 36830/node          
+tcp        0      0 127.0.0.1:34242         127.0.0.1:40309         ESTABLISHED 36754/sshd: root@no 
+tcp        0      0 172.19.0.2:52358        138.91.182.224:443      ESTABLISHED 36830/node          
+tcp        0      0 172.19.0.2:22           10.0.0.141:61819        ESTABLISHED 36754/sshd: root@no 
+tcp        0      0 172.19.0.2:49448        140.82.112.21:443       ESTABLISHED 36830/node          
+tcp6       0      0 :::22                   :::*                    LISTEN      24/sshd: /usr/sbin/ 
+tcp6       0      0 ::1:6379                :::*                    LISTEN      -                   
+```
+
+### 8.3 nginx 配置 tcp 负载均衡
+
+配置 conf 文件夹下的 `nginx.conf` 文件，添加如下配置：
+
+```conf
+stream {
+    # 定义一个名为 "MyServer" 的上游服务器组
+    upstream MyServer {
+        # 使用客户端 IP 地址的哈希值来进行负载均衡，使用一致性哈希算法
+        hash $remote_addr consistent;
+        
+        # 定义第一台上游服务器
+        server 127.0.0.1:6000 weight=1 max_fails=3 fail_timeout=30s;
+        # weight=1 表示这台服务器的权重，默认为1，权重越高，被选中的概率越大
+        # max_fails=3 表示在 fail_timeout 时间内，最多允许失败的次数
+        # fail_timeout=30s 表示在30秒内如果失败次数超过 max_fails，这台服务器会被标记为不可用
+
+        # 定义第二台上游服务器，配置与第一台相同
+        server 127.0.0.1:6001 weight=1 max_fails=3 fail_timeout=30s;
+    }
+
+    # 定义代理服务器配置
+    server {
+        # 设置与上游服务器建立连接的超时时间为1秒
+        proxy_connect_timeout 1s;
+
+        # 设置代理连接的超时时间为3秒
+        proxy_timeout 3s;
+
+        # 定义代理服务器监听的端口为8000
+        listen 8000;
+
+        # 将请求代理到上游服务器组 "MyServer"
+        proxy_pass MyServer;
+
+        # 启用 TCP_NODELAY 选项，减少延迟，立即发送数据
+        tcp_nodelay on;
+    }
+}
+```
+
+![20240719143956](https://cdn.jsdelivr.net/gh/Corner430/Picture/images/20240719143956.png)
+
+> 之后 `./sbin/nginx -s reload` 重新加载配置文件，然后 `netstat -tanp` 查看端口监听情况。
+
+## 9 数据库设计
 
 **User 表**
 
