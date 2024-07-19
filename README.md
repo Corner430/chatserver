@@ -3,10 +3,8 @@
 使用方式
 
 ```shell
-mkdir build && cmake .. && make
+mkdir build && cmake .. && make  # 之后运行可执行文件即可
 ```
-
-之后运行可执行文件即可
 
 ## 1 开发环境
 
@@ -34,6 +32,8 @@ mkdir build && cmake .. && make
 2. 掌握 C++ muduo 网络库的编程以及实现原理
 3. 掌握 Json 的编程应用
 4. 掌握 MySQL 连接池的使用
+5. 掌握 Docker 一键部署
+6. 掌握 CMake
 
 ## 4 数据库设计
 
