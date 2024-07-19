@@ -297,6 +297,18 @@ stream {
 
 > 之后 `./sbin/nginx -s reload` 重新加载配置文件，然后 `netstat -tanp` 查看端口监听情况。
 
+**如果出现很快断开的情况**，请打开 `keepalive`，并确保操作系统级别的 `keepalive` 设置打开。确保操作系统级别的 `keepalive` 设置也支持长时间保持连接。可以在系统配置文件中检查并配置这些参数，例如 `/etc/sysctl.conf`：
+```bash
+# 在/etc/sysctl.conf中添加以下设置，或使用sysctl命令临时设置
+
+# 启用TCP keepalive机制
+net.ipv4.tcp_keepalive_time = 1200  # 连接空闲时间，单位为秒
+net.ipv4.tcp_keepalive_intvl = 75   # 保持活动探测之间的间隔时间，单位为秒
+net.ipv4.tcp_keepalive_probes = 9   # 在认为连接已断开之前发送的探测包数
+```
+
+然后应用这些设置：`sudo sysctl -p`，重新加载 nginx 配置文件。
+
 ## 9 数据库设计
 
 **User 表**
