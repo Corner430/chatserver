@@ -1,5 +1,8 @@
 # 聊天服务器集群版
 
+- [聊天服务器单机版](https://github.com/Corner430/chatserver/tree/standalone)
+- [聊天服务器集群版](https://github.com/Corner430/chatserver/tree/cluster)
+
 使用方式
 
 ```shell
