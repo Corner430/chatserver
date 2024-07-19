@@ -35,6 +35,13 @@ ChatService::ChatService() {
 
   // 获取数据库连接池
   _connPool = ConnectionPool::getConnectionPool();
+
+  // 连接 redis 服务器
+  if (_redis.connect()) {
+    // 设置上报消息的回调
+    _redis.init_notify_handler(
+        std::bind(&ChatService::handleRedisSubscribeMessage, this, _1, _2));
+  }
 }
 
 // 服务器异常，业务重置方法
@@ -75,6 +82,9 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js,
         lock_guard<mutex> lock(_connMutex);
         _userConnMap.insert({id, conn});
       }
+
+      // id 用户登录成功后，向 redis 订阅 channel(id)
+      _redis.subscribe(id);
 
       // 登录成功，更新用户状态信息 state offline => online
       user.setState("online");
@@ -182,6 +192,9 @@ void ChatService::loginout(const TcpConnectionPtr &conn, json &js,
     }
   }
 
+  // 用户注销，相当于就是下线，在 redis 中取消订阅通道
+  _redis.unsubscribe(userid);
+
   // 更新用户的状态信息
   User user(userid, "", "", "offline");
   _userModel.updateState(user);
@@ -221,6 +234,14 @@ void ChatService::oneChat(const TcpConnectionPtr &conn, json &js,
       return;
     }
   }
+
+  // 查询 toid 是否在线
+  User user = _userModel.query(toid);
+  if (user.getState() == "online") {
+    _redis.publish(toid, js.dump());
+    return;
+  }
+
   // toid 不在线，存储离线消息
   _offlineMsgModel.insert(toid, js.dump());
 }
@@ -270,9 +291,27 @@ void ChatService::groupChat(const TcpConnectionPtr &conn, json &js,
     if (it != _userConnMap.end()) {
       // 转发群消息
       it->second->send(js.dump());
-    } else {
-      // 存储离线群消息
-      _offlineMsgModel.insert(id, js.dump());
+    } else { // 查询 toid 是否在线
+      User user = _userModel.query(id);
+      if (user.getState() == "online") {
+        _redis.publish(id, js.dump());
+      } else {
+        // 存储离线群消息
+        _offlineMsgModel.insert(id, js.dump());
+      }
     }
   }
+}
+
+// 从 redis 消息队列中获取订阅的消息
+void ChatService::handleRedisSubscribeMessage(int userid, string msg) {
+  lock_guard<mutex> lock(_connMutex);
+  auto it = _userConnMap.find(userid);
+  if (it != _userConnMap.end()) {
+    it->second->send(msg);
+    return;
+  }
+
+  // 存储该用户的离线消息
+  _offlineMsgModel.insert(userid, msg);
 }

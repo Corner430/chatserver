@@ -17,6 +17,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include/server)
 include_directories(${PROJECT_SOURCE_DIR}/include/server/MySQLConnectionPool)
 include_directories(${PROJECT_SOURCE_DIR}/include/server/dbORM)
 include_directories(${PROJECT_SOURCE_DIR}/include/server/model)
+include_directories(${PROJECT_SOURCE_DIR}/include/server/redis)
 include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
 # link_directories(/usr/lib64/mysql)
 

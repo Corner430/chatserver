@@ -14,6 +14,7 @@ using namespace muduo::net;
 #include "groupmodel.hpp"
 #include "json.hpp"
 #include "offlinemessagemodel.hpp"
+#include "redis.hpp"
 #include "usermodel.hpp"
 using json = nlohmann::json;
 
@@ -54,6 +55,9 @@ public:
   // 获取消息对应的处理器
   MsgHandler getHandler(int msgid);
 
+  // 从redis消息队列中获取订阅的消息
+  void handleRedisSubscribeMessage(int, string);
+
 private:
   ChatService();
 
@@ -71,6 +75,9 @@ private:
   OfflineMsgModel _offlineMsgModel;
   FriendModel _friendModel;
   GroupModel _groupModel;
+
+  // redis 操作对象
+  Redis _redis;
 };
 
 #endif
