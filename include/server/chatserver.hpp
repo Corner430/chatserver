@@ -13,8 +13,7 @@ public:
   ChatServer(EventLoop *loop, const InetAddress &listenAddr,
              const string &nameArg);
 
-  // 启动服务
-  void start();
+  void start(); // 启动服务
 
 private:
   // 上报连接相关信息的回调函数
