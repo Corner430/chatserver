@@ -22,6 +22,7 @@ mkdir build && cmake .. && make # 之后运行可执行文件即可
 - 基于发布-订阅的服务器中间件 redis 消息队列编程实践，借助于 [hiredis](https://github.com/redis/hiredis)
 - MySQL 连接池的使用，借助于 [MySQL-Connection-Pool](https://github.com/Corner430/MySQL-Connection-Pool)
 
+> 建议参照 [开发日志](https://github.com/Corner430/chatserver/blob/main/logs.md) 进行开发学习
 
 ## 2 项目需求
 
@@ -52,11 +53,12 @@ mkdir build && cmake .. && make # 之后运行可执行文件即可
 
 ## 5 muduo 网络库
 
-muduo 的网络设计：*reactors in threads --- one loop per thread*
+muduo 的网络设计：_reactors in threads --- one loop per thread_
 
-特点是 *one loop per thread*，有一个 *main reactor* 负责 *accept* 连接，然后将连接分发给某一个 *sub reactor* 处理（采用 *round-robin* 的方式来选择 *sub reactor*），该连接的所有操作都在那个 *sub reactor* 所处的线程中完成。多个连接可能被分派到多个线程中，以充分利用 CPU 的多核性能。
+特点是 _one loop per thread_，有一个 _main reactor_ 负责 _accept_ 连接，然后将连接分发给某一个 _sub reactor_ 处理（采用 _round-robin_ 的方式来选择 _sub reactor_），该连接的所有操作都在那个 _sub reactor_ 所处的线程中完成。多个连接可能被分派到多个线程中，以充分利用 CPU 的多核性能。
 
-*Reactor poll* 的大小是固定的，根据 CPU 的数目确定。
+_Reactor poll_ 的大小是固定的，根据 CPU 的数目确定。
+
 ```cpp
 // 设置 EventLoop 的线程个数，底层通过 EventLoopThreadPool 线程池管理线程类 EventLoopThread
 _server.setThreadNum(10);
@@ -172,12 +174,13 @@ Reading messages... (press Ctrl-C to quit)
 root@14178aa96595:~# redis-cli
 127.0.0.1:6379> publish "corner" "hello corner!"
 (integer) 1
-127.0.0.1:6379> 
+127.0.0.1:6379>
 ```
 
 > 说明：`publish` 命令用于向指定的 channel 发送消息，返回值是订阅该 channel 的订阅者数量。
 
 进入订阅状态后客户端可能收到 3 种类型的回复。每种类型的回复都包含 3 个值，分别是消息类型、channel 名称和消息体。根据消息类型的不同，后两个值的意义也不同。消息类型的取值如下：
+
 1. `subscribe`：订阅成功。第二个值是订阅成功的 channel 名称，第三个值是当前客户端订阅的 channel 数量。
 2. `message`：收到消息。第二个值是产生消息的 channel 名称，第三个值是消息体。
 3. `unsubscribe`：取消订阅。第二个值是取消订阅的 channel 名称，第三个值是当前客户端订阅的 channel 数量，如果数量为 0，则客户端会退出订阅状态。
@@ -233,23 +236,23 @@ make && make install    # 编译安装
 ```shell
 root@14178aa96595:/usr/local/nginx# netstat -tanp
 Active Internet connections (servers and established)
-Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
-tcp        0      0 127.0.0.1:33060         0.0.0.0:*               LISTEN      -                   
-tcp        0      0 127.0.0.1:40309         0.0.0.0:*               LISTEN      36793/code-f1e16e1e 
-tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
-tcp        0      0 127.0.0.11:40853        0.0.0.0:*               LISTEN      -                   
-tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      61913/nginx: master 
-tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      24/sshd: /usr/sbin/ 
-tcp        0      0 127.0.0.1:6379          0.0.0.0:*               LISTEN      -                   
-tcp        0      0 127.0.0.1:40309         127.0.0.1:34242         ESTABLISHED 36793/code-f1e16e1e 
-tcp        0      0 172.19.0.2:37324        185.125.190.82:80       TIME_WAIT   -                   
-tcp        0      0 172.19.0.2:56746        140.82.112.22:443       ESTABLISHED 36830/node          
-tcp        0      0 127.0.0.1:34242         127.0.0.1:40309         ESTABLISHED 36754/sshd: root@no 
-tcp        0      0 172.19.0.2:52358        138.91.182.224:443      ESTABLISHED 36830/node          
-tcp        0      0 172.19.0.2:22           10.0.0.141:61819        ESTABLISHED 36754/sshd: root@no 
-tcp        0      0 172.19.0.2:49448        140.82.112.21:443       ESTABLISHED 36830/node          
-tcp6       0      0 :::22                   :::*                    LISTEN      24/sshd: /usr/sbin/ 
-tcp6       0      0 ::1:6379                :::*                    LISTEN      -                   
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.0.1:33060         0.0.0.0:*               LISTEN      -
+tcp        0      0 127.0.0.1:40309         0.0.0.0:*               LISTEN      36793/code-f1e16e1e
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -
+tcp        0      0 127.0.0.11:40853        0.0.0.0:*               LISTEN      -
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      61913/nginx: master
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      24/sshd: /usr/sbin/
+tcp        0      0 127.0.0.1:6379          0.0.0.0:*               LISTEN      -
+tcp        0      0 127.0.0.1:40309         127.0.0.1:34242         ESTABLISHED 36793/code-f1e16e1e
+tcp        0      0 172.19.0.2:37324        185.125.190.82:80       TIME_WAIT   -
+tcp        0      0 172.19.0.2:56746        140.82.112.22:443       ESTABLISHED 36830/node
+tcp        0      0 127.0.0.1:34242         127.0.0.1:40309         ESTABLISHED 36754/sshd: root@no
+tcp        0      0 172.19.0.2:52358        138.91.182.224:443      ESTABLISHED 36830/node
+tcp        0      0 172.19.0.2:22           10.0.0.141:61819        ESTABLISHED 36754/sshd: root@no
+tcp        0      0 172.19.0.2:49448        140.82.112.21:443       ESTABLISHED 36830/node
+tcp6       0      0 :::22                   :::*                    LISTEN      24/sshd: /usr/sbin/
+tcp6       0      0 ::1:6379                :::*                    LISTEN      -
 ```
 
 ### 8.3 nginx 配置 tcp 负载均衡
@@ -262,7 +265,7 @@ stream {
     upstream MyServer {
         # 使用客户端 IP 地址的哈希值来进行负载均衡，使用一致性哈希算法
         hash $remote_addr consistent;
-        
+
         # 定义第一台上游服务器
         server 127.0.0.1:6000 weight=1 max_fails=3 fail_timeout=30s;
         # weight=1 表示这台服务器的权重，默认为1，权重越高，被选中的概率越大
@@ -298,8 +301,10 @@ stream {
 > 之后 `./sbin/nginx -s reload` 重新加载配置文件，然后 `netstat -tanp` 查看端口监听情况。
 
 **如果出现很快断开的情况**，可以分别尝试以下两种方法：
+
 1. 加大超时时间
 2. 请打开 `keepalive`，并确保操作系统级别的 `keepalive` 设置打开。确保操作系统级别的 `keepalive` 设置也支持长时间保持连接。可以在系统配置文件中检查并配置这些参数，例如 `/etc/sysctl.conf`：
+
 ```bash
 # 在/etc/sysctl.conf中添加以下设置，或使用sysctl命令临时设置
 
@@ -315,39 +320,39 @@ net.ipv4.tcp_keepalive_probes = 9   # 在认为连接已断开之前发送的探
 
 **User 表**
 
-| 字段名 | 类型 | 说明 | 约束 |
-| --- | --- | --- | --- |
-| id | INT | 用户 id | PRIMARY KEY , AUTO_INCREMENT |
-| name | VARCHAR(50) | 用户名 | NOT NULL , UNIQUE |
-| password | VARCHAR(50) | 密码 | NOT NULL |
-| state | ENUM('online', 'offline') | 用户登录状态 | DEFAULT 'offline' |
+| 字段名   | 类型                      | 说明         | 约束                         |
+| -------- | ------------------------- | ------------ | ---------------------------- |
+| id       | INT                       | 用户 id      | PRIMARY KEY , AUTO_INCREMENT |
+| name     | VARCHAR(50)               | 用户名       | NOT NULL , UNIQUE            |
+| password | VARCHAR(50)               | 密码         | NOT NULL                     |
+| state    | ENUM('online', 'offline') | 用户登录状态 | DEFAULT 'offline'            |
 
 **Friend 表**
 
-| 字段名 | 类型 | 说明 | 约束 |
-| --- | --- | --- | --- |
-| userid | INT | 用户 id | NOT NULL , 联合主键 |
-| friendid | INT | 好友 id | NOT NULL , 联合主键 |
+| 字段名   | 类型 | 说明    | 约束                |
+| -------- | ---- | ------- | ------------------- |
+| userid   | INT  | 用户 id | NOT NULL , 联合主键 |
+| friendid | INT  | 好友 id | NOT NULL , 联合主键 |
 
 **AllGroup 表**
 
-| 字段名 | 类型 | 说明 | 约束 |
-| --- | --- | --- | --- |
-| id | INT | 群组 id | PRIMARY KEY , AUTO_INCREMENT |
-| groupname | VARCHAR(50) | 群组名 | NOT NULL , UNIQUE |
-| groupdesc | VARCHAR(200) | 群组描述 | DEFAULT '' |
+| 字段名    | 类型         | 说明     | 约束                         |
+| --------- | ------------ | -------- | ---------------------------- |
+| id        | INT          | 群组 id  | PRIMARY KEY , AUTO_INCREMENT |
+| groupname | VARCHAR(50)  | 群组名   | NOT NULL , UNIQUE            |
+| groupdesc | VARCHAR(200) | 群组描述 | DEFAULT ''                   |
 
 **GroupUser 表**
 
-| 字段名 | 类型 | 说明 | 约束 |
-| --- | --- | --- | --- |
-| groupid | INT | 群组 id | NOT NULL , 联合主键 |
-| userid | INT | 组员 id | NOT NULL, 联合主键 |
-| grouprole | ENUM('creator', 'normal') | 组员角色 | DEFAULT 'normal' |
+| 字段名    | 类型                      | 说明     | 约束                |
+| --------- | ------------------------- | -------- | ------------------- |
+| groupid   | INT                       | 群组 id  | NOT NULL , 联合主键 |
+| userid    | INT                       | 组员 id  | NOT NULL, 联合主键  |
+| grouprole | ENUM('creator', 'normal') | 组员角色 | DEFAULT 'normal'    |
 
 **OfflineMessage 表**
 
-| 字段名 | 类型 | 说明 | 约束 |
-| --- | --- | --- | --- |
-| userid | INT | 用户 id | NOT NULL |
+| 字段名  | 类型         | 说明                         | 约束     |
+| ------- | ------------ | ---------------------------- | -------- |
+| userid  | INT          | 用户 id                      | NOT NULL |
 | message | VARCHAR(500) | 离线消息（存储 Json 字符串） | NOT NULL |
