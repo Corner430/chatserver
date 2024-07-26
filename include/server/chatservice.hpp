@@ -29,7 +29,7 @@ public:
   static ChatService *instance();
 
   // 单例对象的连接池
-  ConnectionPool *_connPool;
+  ConnectionPool *_connPool;  // TODO delete
 
   // 处理登录业务
   void login(const TcpConnectionPtr &conn, json &js, Timestamp time);
