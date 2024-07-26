@@ -102,6 +102,7 @@ _server.setThreadNum(10);
 │           └── redis.hpp
 ├── lib
 │   └── libmysql_connection_pool.so # MySQL 连接池动态库
+├── logs.md     # 开发日志
 ├── README.md   # 项目说明
 ├── src # 源文件
 │   ├── client
